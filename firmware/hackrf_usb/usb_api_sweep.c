@@ -30,6 +30,7 @@
 #include "tuning.h"
 #include "usb_endpoint.h"
 #include "streaming.h"
+#include "../common/max283x.h"
 
 #include <libopencm3/lpc43xx/m4/nvic.h>
 
@@ -190,6 +191,11 @@ void sweep_mode(uint32_t seq)
 					range = (range + 1) % num_ranges;
 					sweep_freq = (uint64_t) frequencies[range * 2] *
 						FREQ_GRANULARITY;
+					if (sweep_freq > 4000000000) {
+						max283x_set_lna_gain(&max283x, 40UL);
+					} else {
+						max283x_set_lna_gain(&max283x, 24UL);
+					}
 				} else {
 					if (odd) {
 						sweep_freq += step_width / 4;
